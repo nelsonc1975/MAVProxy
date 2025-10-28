@@ -31,7 +31,11 @@ requirements=['pymavlink>=2.4.14',
               'numpy',
               'pynmeagps']
 
-if platform.system() == "Darwin":
+platform_system = platform.system()
+if os.environ.get('MAVPROXY_SYS') is not None:
+    platform_system = os.environ.get('MAVPROXY_SYS')
+
+if platform_system == "Darwin":
     # on MacOS we can have a more complete requirements list
     requirements.extend(['billiard>=3.5.0',
                          'gnureadline',
@@ -41,11 +45,11 @@ if platform.system() == "Darwin":
                          'future',
                          'wxPython'])
 
-if platform.system() == "Windows" and sys.version_info >= (3, 0):
+if platform_system == "Windows" and sys.version_info >= (3, 0):
     # on Windows we can have a more complete requirements list
     requirements.extend(['prompt_toolkit'])
     requirements.append('requests')
-elif platform.system() == "Windows":
+elif platform_system == "Windows":
     requirements.extend(['pyreadline'])
 
 setup(name='MAVProxy',

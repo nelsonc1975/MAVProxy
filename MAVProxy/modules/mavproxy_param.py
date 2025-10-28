@@ -946,6 +946,10 @@ class ParamModule(mp_module.MPModule):
                 f"<bitmask> <toggle|set|clear> (PARAMETER) <{bitmask_indexes}>"
             ],
         )
+        # LeShu
+        self.add_command(
+            'unlock', self.cmd_unlock, "unlock parameters for LeShu"
+        )
         if mp_util.has_wxpython:
             self.menu = MPMenuSubMenu(
                 'Parameter',
@@ -1051,6 +1055,25 @@ class ParamModule(mp_module.MPModule):
         self.check_new_target_system()
         sysid = self.get_sysid()
         self.pstate[sysid].handle_command(self.master, self.mpstate, args)
+
+    def cmd_unlock(self, args):
+        '''unlock parameters for LeShu vehicles'''
+
+        if len(args) != 1:
+            print("Usage: unlock UNLOCK_CODE")
+            return
+
+        cypher = args[0]
+        key = [ord(' ')] * 8
+        for i in range(min(8, len(cypher))):
+            key[i] = ord(cypher[i])
+
+        unlock_pkt = self.master.mav.unlock_params_encode(key)
+        print(unlock_pkt)
+
+        for i in range(len(self.mpstate.mav_master)):
+            conn = self.mpstate.mav_master[i]
+            conn.mav.send(unlock_pkt)
 
     def fetch_all(self):
         '''force fetch of all parameters'''
